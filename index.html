@@ -3,26 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Asil Burger</title>
+    <title>Asil Burger | Buyurtma</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
         body {
-            background: linear-gradient(145deg, #1a1a1a, #2d2a26);
+            background: linear-gradient(145deg, #1a1a1a 0%, #2d2a26 100%);
             color: #f5e6d3;
             padding: 20px;
+            min-height: 100vh;
         }
         .header {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
         .logo {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             background: linear-gradient(135deg, #ffb347, #ff7e5e);
             -webkit-background-clip: text;
             background-clip: text;
@@ -32,77 +33,81 @@
         .sub {
             color: #ffb347;
             font-size: 0.8rem;
+            margin-top: 5px;
         }
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 15px;
+            margin-bottom: 25px;
         }
         .card {
-            background: rgba(255,255,240,0.1);
-            border-radius: 20px;
-            padding: 12px;
+            background: rgba(255,255,240,0.08);
+            border-radius: 24px;
+            padding: 15px 10px;
             text-align: center;
+            border: 1px solid rgba(255,165,70,0.3);
         }
         .emoji {
-            font-size: 2rem;
+            font-size: 2.5rem;
         }
         .item-name {
-            font-weight: bold;
+            font-weight: 600;
+            margin: 8px 0 4px;
             font-size: 0.9rem;
-            margin: 5px 0;
         }
         .price {
             color: #ffb347;
             font-weight: bold;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
         .quantity-control {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
-            margin-top: 8px;
+            gap: 12px;
+            margin-top: 12px;
         }
         .qty-btn {
             background: #ff7e5e;
             border: none;
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            font-size: 1rem;
+            font-size: 1.2rem;
             font-weight: bold;
             color: white;
             cursor: pointer;
         }
         .cart-section {
             background: #2a241f;
-            border-radius: 20px;
-            padding: 15px;
-            margin-top: 10px;
+            border-radius: 28px;
+            padding: 18px;
+            border: 1px solid #ff9f4a;
         }
         .cart-title {
+            font-size: 1.2rem;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
         .cart-items {
-            max-height: 150px;
+            max-height: 160px;
             overflow-y: auto;
-            margin-bottom: 10px;
-            font-size: 0.8rem;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
         }
         .cart-item {
             display: flex;
             justify-content: space-between;
-            padding: 5px 0;
-            border-bottom: 1px dashed #ffb34750;
+            padding: 6px 0;
+            border-bottom: 1px dashed #ffb34760;
         }
         .total {
+            font-size: 1.1rem;
             font-weight: bold;
             text-align: right;
             color: #ffb347;
-            margin: 10px 0;
+            margin: 10px 0 8px;
         }
         .input-field {
             width: 100%;
@@ -113,40 +118,38 @@
             background: rgba(255,255,255,0.1);
             color: white;
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
         .input-field::placeholder {
             color: #ffb34780;
         }
         textarea.input-field {
             text-align: left;
-            padding: 12px;
-            resize: none;
-            font-family: monospace;
-        }
-        .btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 25px;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            margin-top: 8px;
-        }
-        .btn-order {
-            background: linear-gradient(95deg, #ff7e5e, #ff4d2e);
+            resize: vertical;
+            font-family: inherit;
         }
         .label {
             font-size: 0.7rem;
             color: #ffb347;
-            margin-top: 5px;
+            margin-top: 8px;
             text-align: left;
+        }
+        .btn-order {
+            background: linear-gradient(95deg, #ff7e5e, #ff4d2e);
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            margin-top: 15px;
         }
         footer {
             text-align: center;
-            font-size: 0.6rem;
-            margin-top: 15px;
+            font-size: 0.65rem;
+            margin-top: 20px;
             opacity: 0.5;
         }
     </style>
@@ -164,18 +167,17 @@
         <div class="cart-items" id="cartItems">Savat bo'sh</div>
         <div class="total" id="totalAmount">0 so'm</div>
         
-        <div class="label">📞 Telefon raqam</div>
+        <div class="label">📞 Telefon raqam (masalan: +998901234567)</div>
         <input type="tel" id="phone" class="input-field" placeholder="+998 __ ___ __ __">
-        
+
         <div class="label">📍 Yetkazib berish manzili (ko'cha, uy, tuman, shahar)</div>
-        <textarea id="address" class="input-field" rows="3" placeholder="Masalan: Navoiy ko'chasi 15-uy, Chilonzor tumani, Toshkent"></textarea>
+        <textarea id="address" class="input-field" rows="2" placeholder="Masalan: Navoiy ko'chasi 15-uy, Chilonzor tumani, Toshkent"></textarea>
         
-        <button class="btn btn-order" id="orderBtn">✅ Buyurtma berish</button>
+        <button class="btn-order" id="orderBtn">✅ Buyurtma berish</button>
     </div>
-    <footer>Asil Burger 2026 | O'zgacha lazzat, o'zgacha uslub</footer>
+    <footer>Asil Burger 2026 | Interaktiv buyurtma</footer>
 
     <script>
-        // MAHSULOTLAR
         const MENU = {
             "Gamburger": { price: 25000, emoji: "🍔" },
             "Cheeseburger": { price: 30000, emoji: "🧀" },
@@ -185,15 +187,11 @@
             "Hot-dog": { price: 18000, emoji: "🌭" }
         };
 
-        // O'ZGARUVCHILAR
         let cart = {};
-        
-        // TELEGRAM WEBAPP
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
 
-        // MENYUNI KO'RSATISH
         function renderMenu() {
             const container = document.getElementById('menuGrid');
             container.innerHTML = '';
@@ -205,7 +203,7 @@
                         <div class="price">${data.price.toLocaleString()} so'm</div>
                         <div class="quantity-control">
                             <button class="qty-btn" onclick="changeQty('${name}', -1)">−</button>
-                            <span id="qty-${name.replace(/\s/g,'')}">0</span>
+                            <span id="qty-${name.replace(/\s/g,'')}">${cart[name] || 0}</span>
                             <button class="qty-btn" onclick="changeQty('${name}', 1)">+</button>
                         </div>
                     </div>
@@ -213,7 +211,6 @@
             }
         }
 
-        // MAHSULOT QO'SHISH/KAMAYTIRISH
         function changeQty(name, delta) {
             let current = cart[name] || 0;
             let newVal = current + delta;
@@ -221,64 +218,48 @@
             if (newVal === 0) delete cart[name];
             else cart[name] = newVal;
             
-            document.getElementById(`qty-${name.replace(/\s/g,'')}`).innerText = cart[name] || 0;
+            const span = document.getElementById(`qty-${name.replace(/\s/g,'')}`);
+            if (span) span.innerText = cart[name] || 0;
             updateCart();
         }
 
-        // SAVATNI YANGILASH
         function updateCart() {
             const cartDiv = document.getElementById('cartItems');
             let total = 0;
-            
-            if (Object.keys(cart).length === 0) {
-                cartDiv.innerHTML = 'Savat bo\'sh';
-                document.getElementById('totalAmount').innerHTML = '0 so\'m';
-                return;
-            }
-            
             cartDiv.innerHTML = '';
             for (const [item, qty] of Object.entries(cart)) {
                 const sum = MENU[item].price * qty;
                 total += sum;
                 cartDiv.innerHTML += `<div class="cart-item"><span>${MENU[item].emoji} ${item} x${qty}</span><span>${sum.toLocaleString()} so'm</span></div>`;
             }
+            if (Object.keys(cart).length === 0) cartDiv.innerHTML = 'Savat bo\'sh';
             document.getElementById('totalAmount').innerHTML = `<strong>Jami: ${total.toLocaleString()} so'm</strong>`;
         }
 
-        // BUYURTMA BERISH
         document.getElementById('orderBtn').onclick = () => {
             const phone = document.getElementById('phone').value.trim();
             const address = document.getElementById('address').value.trim();
             
-            // Tekshirishlar
             if (Object.keys(cart).length === 0) {
-                tg.showPopup({ title: "❌ Xatolik", message: "Mahsulot tanlang!" });
+                tg.showPopup({ title: "Xatolik", message: "Kamida bitta mahsulot tanlang!" });
                 return;
             }
-            
-            if (!phone || phone.length < 9) {
-                tg.showPopup({ title: "❌ Xatolik", message: "Telefon raqam kiriting!" });
+            if (!phone) {
+                tg.showPopup({ title: "Xatolik", message: "Telefon raqam kiriting!" });
                 return;
             }
-            
-            if (!address || address.length < 5) {
-                tg.showPopup({ title: "❌ Xatolik", message: "Yetkazib berish manzilini kiriting!" });
+            if (!address) {
+                tg.showPopup({ title: "Xatolik", message: "Yetkazib berish manzilini kiriting!" });
                 return;
             }
             
             const total = Object.entries(cart).reduce((s, [i,q]) => s + MENU[i].price * q, 0);
-            const orderData = {
-                cart: cart,
-                total: total,
-                phone: phone,
-                address: address
-            };
-            
-            tg.sendData(JSON.stringify(orderData));
+            tg.sendData(JSON.stringify({ cart, total, phone, address }));
             tg.close();
         };
 
         renderMenu();
+        updateCart();
     </script>
 </body>
 </html>
