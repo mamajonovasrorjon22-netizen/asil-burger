@@ -10,10 +10,10 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, sans-serif;
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
         }
         body {
-            background: linear-gradient(145deg, #1a1a1a, #2d2a26);
+            background: linear-gradient(145deg, #1a1a1a 0%, #2d2a26 100%);
             color: #f5e6d3;
             padding: 20px;
             min-height: 100vh;
@@ -23,29 +23,28 @@
             margin-bottom: 30px;
         }
         .logo {
-            font-size: 2.6rem;
-            font-weight: bold;
+            font-size: 3rem;
             background: linear-gradient(135deg, #ffb347, #ff7e5e);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            font-weight: bold;
         }
         .sub {
             color: #ffb347;
             font-size: 0.9rem;
-            margin-top: 6px;
+            margin-top: 5px;
         }
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
+            gap: 15px;
+            margin-bottom: 25px;
         }
         .card {
             background: rgba(255,255,240,0.08);
-            backdrop-filter: blur(4px);
-            border-radius: 28px;
-            padding: 16px 8px;
+            border-radius: 24px;
+            padding: 15px 10px;
             text-align: center;
             border: 1px solid rgba(255,165,70,0.3);
         }
@@ -70,19 +69,19 @@
         .qty-btn {
             background: #ff7e5e;
             border: none;
-            width: 34px;
-            height: 34px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: bold;
             color: white;
             cursor: pointer;
         }
         .cart-section {
-            background: #2a241fe0;
-            backdrop-filter: blur(8px);
-            border-radius: 32px;
+            background: #2a241f;
+            border-radius: 28px;
             padding: 18px;
+            margin-top: 10px;
             border: 1px solid #ff9f4a;
         }
         .cart-title {
@@ -106,6 +105,7 @@
             font-weight: bold;
             text-align: right;
             color: #ffb347;
+            margin-top: 10px;
         }
         .btn-order {
             background: linear-gradient(95deg, #ff7e5e, #ff4d2e);
@@ -114,8 +114,9 @@
             border: none;
             border-radius: 50px;
             font-weight: bold;
-            margin-top: 14px;
+            font-size: 1rem;
             color: white;
+            margin-top: 12px;
             cursor: pointer;
         }
         .loc-btn {
@@ -127,7 +128,7 @@
             text-align: center;
             font-size: 0.7rem;
             margin-top: 20px;
-            opacity: 0.6;
+            opacity: 0.5;
         }
     </style>
 </head>
@@ -162,111 +163,80 @@
         let userLocation = null;
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.ready();
 
         function renderMenu() {
             const container = document.getElementById('menuGrid');
-            if (!container) return;
             container.innerHTML = '';
             for (const [name, data] of Object.entries(MENU)) {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <div class="emoji">${data.emoji}</div>
-                    <div class="item-name">${name}</div>
-                    <div class="price">${data.price.toLocaleString()} so'm</div>
-                    <div class="quantity-control">
-                        <button class="qty-btn" data-name="${name}" data-delta="-1">−</button>
-                        <span class="qty-value" id="qty-${name.replace(/\s/g, '')}">${cart[name] || 0}</span>
-                        <button class="qty-btn" data-name="${name}" data-delta="1">+</button>
+                container.innerHTML += `
+                    <div class="card">
+                        <div class="emoji">${data.emoji}</div>
+                        <div class="item-name">${name}</div>
+                        <div class="price">${data.price.toLocaleString()} so'm</div>
+                        <div class="quantity-control">
+                            <button class="qty-btn" onclick="changeQty('${name}', -1)">−</button>
+                            <span id="qty-${name.replace(/\s/g,'')}">${cart[name] || 0}</span>
+                            <button class="qty-btn" onclick="changeQty('${name}', 1)">+</button>
+                        </div>
                     </div>
                 `;
-                container.appendChild(card);
             }
-            attachEvents();
         }
 
-        function attachEvents() {
-            document.querySelectorAll('.qty-btn').forEach(btn => {
-                btn.removeEventListener('click', qtyHandler);
-                btn.addEventListener('click', qtyHandler);
-            });
-        }
-
-        function qtyHandler(e) {
-            const name = e.target.getAttribute('data-name');
-            const delta = parseInt(e.target.getAttribute('data-delta'));
-            if (!name) return;
+        function changeQty(name, delta) {
             let current = cart[name] || 0;
             let newVal = current + delta;
             if (newVal < 0) newVal = 0;
             if (newVal === 0) delete cart[name];
             else cart[name] = newVal;
-            updateDisplay();
-        }
-
-        function updateDisplay() {
-            for (const name of Object.keys(MENU)) {
-                const span = document.getElementById(`qty-${name.replace(/\s/g, '')}`);
-                if (span) span.innerText = cart[name] || 0;
-            }
-
+            
+            // Update display
+            const span = document.getElementById(`qty-${name.replace(/\s/g,'')}`);
+            if (span) span.innerText = cart[name] || 0;
+            
+            // Update cart
             const cartDiv = document.getElementById('cartItems');
-            if (!cartDiv) return;
             let total = 0;
             cartDiv.innerHTML = '';
             for (const [item, qty] of Object.entries(cart)) {
                 const sum = MENU[item].price * qty;
                 total += sum;
-                const div = document.createElement('div');
-                div.className = 'cart-item';
-                div.innerHTML = `<span>${MENU[item].emoji} ${item} x${qty}</span><span>${sum.toLocaleString()} so'm</span>`;
-                cartDiv.appendChild(div);
+                cartDiv.innerHTML += `<div class="cart-item"><span>${MENU[item].emoji} ${item} x${qty}</span><span>${sum.toLocaleString()} so'm</span></div>`;
             }
-            if (Object.keys(cart).length === 0) {
-                cartDiv.innerHTML = '<div style="text-align:center">Savat bo\'sh</div>';
-            }
-            const totalSpan = document.getElementById('totalAmount');
-            if (totalSpan) totalSpan.innerText = total.toLocaleString() + ' so\'m';
+            if (Object.keys(cart).length === 0) cartDiv.innerHTML = '<div style="text-align:center">Savat bo\'sh</div>';
+            document.getElementById('totalAmount').innerHTML = `<strong>Jami: ${total.toLocaleString()} so'm</strong>`;
         }
 
-        // Lokatsiya
-        const sendBtn = document.getElementById('sendLocationBtn');
-        if (sendBtn) {
-            sendBtn.onclick = () => {
-                tg.requestLocation();
-            };
-        }
+        // Location
+        document.getElementById('sendLocationBtn').onclick = () => {
+            tg.requestLocation();
+        };
 
         tg.onEvent('locationSent', (location) => {
             userLocation = { lat: location.latitude, lon: location.longitude };
             tg.showPopup({
-                title: "📍 Manzil qabul qilindi",
+                title: "✅ Manzil qabul qilindi",
                 message: `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`,
                 buttons: [{ type: "ok" }]
             });
         });
 
-        // Buyurtma
-        const orderBtn = document.getElementById('orderBtn');
-        if (orderBtn) {
-            orderBtn.onclick = () => {
-                if (Object.keys(cart).length === 0) {
-                    tg.showPopup({ title: "Xatolik", message: "Kamida bitta mahsulot tanlang!", buttons: [{ type: "ok" }] });
-                    return;
-                }
-                if (!userLocation) {
-                    tg.showPopup({ title: "Lokatsiya kerak", message: "Yetkazib berish uchun joylashuvingizni yuboring!", buttons: [{ type: "ok" }] });
-                    return;
-                }
-                const total = Object.values(cart).reduce((sum, qty, idx) => sum + Object.values(MENU)[idx].price * qty, 0);
-                tg.sendData(JSON.stringify({ cart, total, location: userLocation }));
-                tg.close();
-            };
-        }
+        // Order
+        document.getElementById('orderBtn').onclick = () => {
+            if (Object.keys(cart).length === 0) {
+                tg.showPopup({ title: "❌ Xatolik", message: "Iltimos, kamida bitta mahsulot tanlang!" });
+                return;
+            }
+            if (!userLocation) {
+                tg.showPopup({ title: "📍 Lokatsiya kerak", message: "Yetkazib berish uchun lokatsiyangizni yuboring!" });
+                return;
+            }
+            const total = Object.entries(cart).reduce((s, [i,q]) => s + MENU[i].price * q, 0);
+            tg.sendData(JSON.stringify({ cart, total, location: userLocation }));
+            tg.close();
+        };
 
         renderMenu();
-        updateDisplay();
     </script>
 </body>
 </html>
