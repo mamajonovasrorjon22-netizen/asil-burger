@@ -167,11 +167,11 @@
         <div class="cart-items" id="cartItems">Savat bo'sh</div>
         <div class="total" id="totalAmount">0 so'm</div>
         
-        <div class="label">📞 Telefon raqam (masalan: +998901234567)</div>
+        <div class="label">📞 Telefon raqam</div>
         <input type="tel" id="phone" class="input-field" placeholder="+998 __ ___ __ __">
 
-        <div class="label">📍 Yetkazib berish manzili (ko'cha, uy, tuman, shahar)</div>
-        <textarea id="address" class="input-field" rows="2" placeholder="Masalan: Navoiy ko'chasi 15-uy, Chilonzor tumani, Toshkent"></textarea>
+        <div class="label">📍 Yetkazib berish manzili</div>
+        <textarea id="address" class="input-field" rows="2" placeholder="Ko'cha, uy, tuman, shahar"></textarea>
         
         <button class="btn-order" id="orderBtn">✅ Buyurtma berish</button>
     </div>
@@ -241,7 +241,7 @@
             const address = document.getElementById('address').value.trim();
             
             if (Object.keys(cart).length === 0) {
-                tg.showPopup({ title: "Xatolik", message: "Kamida bitta mahsulot tanlang!" });
+                tg.showPopup({ title: "Xatolik", message: "Mahsulot tanlang!" });
                 return;
             }
             if (!phone) {
@@ -249,7 +249,7 @@
                 return;
             }
             if (!address) {
-                tg.showPopup({ title: "Xatolik", message: "Yetkazib berish manzilini kiriting!" });
+                tg.showPopup({ title: "Xatolik", message: "Manzil kiriting!" });
                 return;
             }
             
