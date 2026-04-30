@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Asil Burger | Interaktiv menyu</title>
+    <title>Asil Burger | Ilova</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -23,7 +23,7 @@
             margin-bottom: 30px;
         }
         .logo {
-            font-size: 3rem;
+            font-size: 2.8rem;
             background: linear-gradient(135deg, #ffb347, #ff7e5e);
             -webkit-background-clip: text;
             background-clip: text;
@@ -32,7 +32,7 @@
         }
         .sub {
             color: #ffb347;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             margin-top: 5px;
         }
         .menu-grid {
@@ -49,15 +49,17 @@
             border: 1px solid rgba(255,165,70,0.3);
         }
         .emoji {
-            font-size: 2.8rem;
+            font-size: 2.5rem;
         }
         .item-name {
             font-weight: 600;
             margin: 8px 0 4px;
+            font-size: 0.9rem;
         }
         .price {
             color: #ffb347;
             font-weight: bold;
+            font-size: 0.9rem;
         }
         .quantity-control {
             display: flex;
@@ -81,18 +83,18 @@
             background: #2a241f;
             border-radius: 28px;
             padding: 18px;
-            margin-top: 10px;
             border: 1px solid #ff9f4a;
         }
         .cart-title {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: bold;
             margin-bottom: 12px;
         }
         .cart-items {
-            max-height: 180px;
+            max-height: 160px;
             overflow-y: auto;
             margin-bottom: 12px;
+            font-size: 0.85rem;
         }
         .cart-item {
             display: flex;
@@ -101,11 +103,11 @@
             border-bottom: 1px dashed #ffb34760;
         }
         .total {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
             text-align: right;
             color: #ffb347;
-            margin-top: 10px;
+            margin: 10px 0 8px;
         }
         .btn-order {
             background: linear-gradient(95deg, #ff7e5e, #ff4d2e);
@@ -114,19 +116,17 @@
             border: none;
             border-radius: 50px;
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: white;
-            margin-top: 12px;
             cursor: pointer;
         }
         .loc-btn {
             background: #3c6e47;
-            margin-top: 0;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
         footer {
             text-align: center;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             margin-top: 20px;
             opacity: 0.5;
         }
@@ -147,7 +147,7 @@
         <button class="btn-order loc-btn" id="sendLocationBtn">📍 Lokatsiyani yuborish</button>
         <button class="btn-order" id="orderBtn">✅ Buyurtma berish</button>
     </div>
-    <footer>Asil Burger 2026 | Interaktiv buyurtma</footer>
+    <footer>Asil Burger 2026 | Ilova</footer>
 
     <script>
         const MENU = {
@@ -163,6 +163,7 @@
         let userLocation = null;
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.ready();
 
         function renderMenu() {
             const container = document.getElementById('menuGrid');
@@ -190,11 +191,11 @@
             if (newVal === 0) delete cart[name];
             else cart[name] = newVal;
             
-            // Update display
+            // Qiyamatni yangilash
             const span = document.getElementById(`qty-${name.replace(/\s/g,'')}`);
             if (span) span.innerText = cart[name] || 0;
             
-            // Update cart
+            // Savatni yangilash
             const cartDiv = document.getElementById('cartItems');
             let total = 0;
             cartDiv.innerHTML = '';
@@ -207,11 +208,9 @@
             document.getElementById('totalAmount').innerHTML = `<strong>Jami: ${total.toLocaleString()} so'm</strong>`;
         }
 
-        // Location
-        document.getElementById('sendLocationBtn').onclick = () => {
-            tg.requestLocation();
-        };
-
+        // Lokatsiya
+        document.getElementById('sendLocationBtn').onclick = () => tg.requestLocation();
+        
         tg.onEvent('locationSent', (location) => {
             userLocation = { lat: location.latitude, lon: location.longitude };
             tg.showPopup({
@@ -221,14 +220,14 @@
             });
         });
 
-        // Order
+        // Buyurtma
         document.getElementById('orderBtn').onclick = () => {
             if (Object.keys(cart).length === 0) {
-                tg.showPopup({ title: "❌ Xatolik", message: "Iltimos, kamida bitta mahsulot tanlang!" });
+                tg.showPopup({ title: "Xatolik", message: "Mahsulot tanlang!" });
                 return;
             }
             if (!userLocation) {
-                tg.showPopup({ title: "📍 Lokatsiya kerak", message: "Yetkazib berish uchun lokatsiyangizni yuboring!" });
+                tg.showPopup({ title: "Lokatsiya kerak", message: "Joylashuvingizni yuboring!" });
                 return;
             }
             const total = Object.entries(cart).reduce((s, [i,q]) => s + MENU[i].price * q, 0);
