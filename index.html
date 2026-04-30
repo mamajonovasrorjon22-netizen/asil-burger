@@ -19,7 +19,7 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         .logo {
             font-size: 2.5rem;
@@ -104,10 +104,10 @@
             color: #ffb347;
             margin: 10px 0;
         }
-        input {
+        .input-field {
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
+            padding: 12px;
+            margin: 8px 0;
             border-radius: 25px;
             border: none;
             background: rgba(255,255,255,0.1);
@@ -115,12 +115,18 @@
             text-align: center;
             font-size: 0.9rem;
         }
-        input::placeholder {
+        .input-field::placeholder {
             color: #ffb34780;
+        }
+        textarea.input-field {
+            text-align: left;
+            padding: 12px;
+            resize: none;
+            font-family: monospace;
         }
         .btn {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: none;
             border-radius: 25px;
             font-weight: bold;
@@ -128,11 +134,14 @@
             cursor: pointer;
             margin-top: 8px;
         }
-        .btn-location {
-            background: #3c6e47;
-        }
         .btn-order {
             background: linear-gradient(95deg, #ff7e5e, #ff4d2e);
+        }
+        .label {
+            font-size: 0.7rem;
+            color: #ffb347;
+            margin-top: 5px;
+            text-align: left;
         }
         footer {
             text-align: center;
@@ -155,14 +164,15 @@
         <div class="cart-items" id="cartItems">Savat bo'sh</div>
         <div class="total" id="totalAmount">0 so'm</div>
         
-        <input type="tel" id="phone" placeholder="📞 Telefon raqam: +998 __ ___ __ __">
+        <div class="label">📞 Telefon raqam</div>
+        <input type="tel" id="phone" class="input-field" placeholder="+998 __ ___ __ __">
         
-        <div id="locationStatus" style="text-align:center; font-size:0.75rem; color:#ffb347; margin:5px 0;"></div>
+        <div class="label">📍 Yetkazib berish manzili (ko'cha, uy, tuman, shahar)</div>
+        <textarea id="address" class="input-field" rows="3" placeholder="Masalan: Navoiy ko'chasi 15-uy, Chilonzor tumani, Toshkent"></textarea>
         
-        <button class="btn btn-location" id="locationBtn">📍 Lokatsiyani yuborish</button>
         <button class="btn btn-order" id="orderBtn">✅ Buyurtma berish</button>
     </div>
-    <footer>Asil Burger 2026</footer>
+    <footer>Asil Burger 2026 | O'zgacha lazzat, o'zgacha uslub</footer>
 
     <script>
         // MAHSULOTLAR
@@ -177,8 +187,6 @@
 
         // O'ZGARUVCHILAR
         let cart = {};
-        let userLocation = null;
-        let locationAddress = null;
         
         // TELEGRAM WEBAPP
         const tg = window.Telegram.WebApp;
@@ -237,58 +245,24 @@
             document.getElementById('totalAmount').innerHTML = `<strong>Jami: ${total.toLocaleString()} so'm</strong>`;
         }
 
-        // MANZILNI KO'CHA NOMI BILAN OLISH
-        async function getAddress(lat, lon) {
-            try {
-                const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=uz`;
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                if (data && data.display_name) {
-                    let shortAddress = data.display_name.split(',');
-                    return shortAddress.slice(0, 3).join(', ');
-                }
-                return `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-            } catch(e) {
-                return `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-            }
-        }
-
-        // LOKATSIYA TUGMASI
-        document.getElementById('locationBtn').onclick = () => {
-            document.getElementById('locationStatus').innerHTML = '⏳ Lokatsiya yuborilmoqda...';
-            tg.requestLocation();
-        };
-
-        // LOKATSIYA QABUL QILISH
-        tg.onEvent('locationSent', async (location) => {
-            userLocation = { lat: location.latitude, lon: location.longitude };
-            locationAddress = await getAddress(location.latitude, location.longitude);
-            document.getElementById('locationStatus').innerHTML = `✅ ${locationAddress}`;
-            
-            tg.showPopup({
-                title: "✅ Manzil qabul qilindi",
-                message: locationAddress,
-                buttons: [{ type: "ok" }]
-            });
-        });
-
         // BUYURTMA BERISH
         document.getElementById('orderBtn').onclick = () => {
             const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
             
+            // Tekshirishlar
             if (Object.keys(cart).length === 0) {
-                tg.showPopup({ title: "Xatolik", message: "Mahsulot tanlang!" });
+                tg.showPopup({ title: "❌ Xatolik", message: "Mahsulot tanlang!" });
                 return;
             }
             
             if (!phone || phone.length < 9) {
-                tg.showPopup({ title: "Xatolik", message: "Telefon raqam kiriting!" });
+                tg.showPopup({ title: "❌ Xatolik", message: "Telefon raqam kiriting!" });
                 return;
             }
             
-            if (!userLocation) {
-                tg.showPopup({ title: "Xatolik", message: "Lokatsiya yuboring!" });
+            if (!address || address.length < 5) {
+                tg.showPopup({ title: "❌ Xatolik", message: "Yetkazib berish manzilini kiriting!" });
                 return;
             }
             
@@ -297,8 +271,7 @@
                 cart: cart,
                 total: total,
                 phone: phone,
-                location: userLocation,
-                address: locationAddress
+                address: address
             };
             
             tg.sendData(JSON.stringify(orderData));
